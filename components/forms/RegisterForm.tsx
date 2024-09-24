@@ -20,7 +20,6 @@ import { SelectItem } from "../ui/select"
 import { Doctors } from "@/constants"
 import Image from "next/image"
 import FileUploader from "../FileUploader"
-import { register } from "module"
 
  
 const RegisterForm = ({user}: {user: User}) => {
@@ -43,11 +42,17 @@ const RegisterForm = ({user}: {user: User}) => {
     setIsLoading(true);
 
     let formData;
-    if (values.identificationDocument && values.identificationDocument.length > 0) {
-      const blobFile = new Blob([values.identificationDocument[0]], { type: values.identificationDocument[0].type });
+    if (
+      values.identificationDocument &&
+      values.identificationDocument?.length > 0
+    ) {
+      const blobFile = new Blob([values.identificationDocument[0]], {
+        type: values.identificationDocument[0].type,
+      });
+
       formData = new FormData();
-      formData.append('blobFile', blobFile);
-      formData.append('name', values.identificationDocument[0].name);
+      formData.append("blobFile", blobFile);
+      formData.append("fileName", values.identificationDocument[0].name);
     }
 
     try {

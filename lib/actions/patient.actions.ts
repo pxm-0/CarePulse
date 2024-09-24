@@ -1,8 +1,9 @@
 "use server"
 
-import { ID, Query, InputFile } from "node-appwrite"
+import { ID, Query } from "node-appwrite"
 import { BUCKET_ID, DATABASE_ID, ENDPOINT, PATIENT_COLLECTION_ID, PROJECT_ID, databases, storage, users } from "../appwrite.config"
 import { parseStringify } from "../utils"
+import { InputFile } from "node-appwrite/file"
 
 
 export const createUser = async (user: CreateUserParams) => {
@@ -41,13 +42,17 @@ export const getUser = async (userId: string) => {
 
 export const registerPatient = async ( {identificationDocument, ...patient }: RegisterUserParams) => {
   try {
+    // Upload file ->  // https://appwrite.io/docs/references/cloud/client-web/storage#createFile
     let file;
     if (identificationDocument) {
-      const inputFile = InputFile.fromBuffer(
-        identificationDocument?.get('blobFile') as Blob,
-        identificationDocument?.get('fileName') as string
-      )
-      file = await storage.createFile(BUCKET_ID, ID.unique(), inputFile, ['*'])
+      const inputFile =
+        identificationDocument &&
+        InputFile.fromBlob(
+          identificationDocument?.get("blobFile") as Blob,
+          identificationDocument?.get("fileName") as string
+        );
+
+      file = await storage.createFile(BUCKET_ID!, ID.unique(), inputFile);
     }
 
     const newPatient = await databases.createDocument(
